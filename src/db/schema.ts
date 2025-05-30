@@ -14,8 +14,13 @@ export const patientSexEnum = pgEnum("patient_sex_enum", ["male", "female"]);
 export const users = pgTable("users", {
 	id: uuid("id").defaultRandom().primaryKey(),
 	name: text("name").notNull(),
-	age: integer("age").notNull(),
 	email: text("email").notNull().unique(),
+	username: text("username").notNull().unique(),
+	password: text("password").notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.$onUpdate(() => new Date()),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
