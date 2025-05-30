@@ -1,17 +1,5 @@
-"use client";
-
+import { SignInForm } from "@/components/core/sign-in-form";
 import { SignUpForm } from "@/components/core/sign-up-form";
-import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function AuthenticationPage() {
@@ -31,43 +19,7 @@ export default function AuthenticationPage() {
 						</TabsTrigger>
 					</TabsList>
 					<TabsContent value="login">
-						<Card>
-							<CardHeader>
-								<CardTitle className="font-inter font-bold text-2xl">
-									Login
-								</CardTitle>
-								<CardDescription className="font-plus-jakarta-sans">
-									Realize login da sua conta para continuar.
-								</CardDescription>
-							</CardHeader>
-							<CardContent className="grid gap-6">
-								<div className="grid gap-3">
-									<Label htmlFor="tabs-demo-name" className="font-inter">
-										Nome
-									</Label>
-									<Input
-										id="tabs-demo-name"
-										placeholder="Pedro Duarte"
-										className="font-plus-jakarta-sans text-sm"
-										required
-									/>
-								</div>
-								<div className="grid gap-3">
-									<Label htmlFor="tabs-demo-username" className="font-inter">
-										Username
-									</Label>
-									<Input
-										id="tabs-demo-username"
-										placeholder="@buscador"
-										className="font-plus-jakarta-sans text-sm"
-										required
-									/>
-								</div>
-							</CardContent>
-							<CardFooter>
-								<Button>Entrar</Button>
-							</CardFooter>
-						</Card>
+						<SignInForm />
 					</TabsContent>
 					<TabsContent value="register">
 						<SignUpForm />
