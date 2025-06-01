@@ -3,6 +3,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 
+import { Toaster } from "@/components/ui/sonner";
+
 const geistSans = Geist({
 	variable: "--font-geist-sans",
 	subsets: ["latin"],
@@ -36,9 +38,32 @@ export default function RootLayout({
 	return (
 		<html lang="pt-BR">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${plusJakartaSans.variable} antialiased flex max-w-screen min-h-screen`}
+				className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${plusJakartaSans.variable} antialiased flex flex-col items-center justify-center w-screen max-w-screen min-h-screen`}
 			>
 				{children}
+				<Toaster
+					toastOptions={{
+						duration: 4000,
+						style: {
+							fontFamily: "var(--font-plus-jakarta-sans)",
+							fontSize: "14px",
+							fontWeight: "400",
+							lineHeight: "20px",
+							backgroundColor: "var(--popover)",
+							color: "var(--primary)",
+							borderColor: "var(--ring)",
+							borderWidth: "1px",
+							borderStyle: "solid",
+							borderRadius: "4px",
+							padding: "16px",
+							boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+							transition: "all 0.5s ease-in-out",
+						},
+					}}
+					position="bottom-center"
+					richColors
+					theme="dark"
+				/>
 			</body>
 		</html>
 	);
