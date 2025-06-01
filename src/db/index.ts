@@ -2,6 +2,9 @@ import "dotenv/config";
 
 import { drizzle } from "drizzle-orm/node-postgres";
 
-const db = drizzle(process.env.DATABASE_URL!);
+import * as schema from "./schema";
 
-export { db };
+// biome-ignore lint/style/noNonNullAssertion: <explanation>
+export const db = drizzle(process.env.DATABASE_URL!, {
+	schema,
+});

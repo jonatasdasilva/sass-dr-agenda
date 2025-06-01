@@ -1,7 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { RiGoogleFill } from "@remixicon/react";
+import { RiLoader5Line } from "@remixicon/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -13,94 +17,76 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import {
-	Form,
-	FormControl,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
-} from "@/components/ui/form";
+import { FormControl, FormMessage } from "@/components/ui/form";
+import { FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 
-const formSchema = z.object({
-	name: z.string().trim().min(3, {
-		message: "Nome é obrigatório, com no mínimo 3 caracteres",
-	}),
-	password: z
-		.string()
-		.trim()
-		.min(8, { message: "Senha obrigatória, com no mínimo 8 caracteres" }),
+const registerSchema = z.object({
+	name: z.string().trim().min(1, { message: "Nome é obrigatório" }),
 	email: z
 		.string()
 		.trim()
-		.min(1, { message: "Email é obrigatório" })
-		.email({ message: "Email inválido" }),
-	username: z
+		.min(1, { message: "E-mail é obrigatório" })
+		.email({ message: "E-mail inválido" }),
+	password: z
 		.string()
 		.trim()
-		.min(3, { message: "Username deve ter pelo menos 3 caracteres" }),
+		.min(8, { message: "A senha deve ter pelo menos 8 caracteres" }),
 });
 
 function SignUpForm() {
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
+	const router = useRouter();
+	const form = useForm<z.infer<typeof registerSchema>>({
+		resolver: zodResolver(registerSchema),
 		defaultValues: {
 			name: "",
-			password: "",
 			email: "",
-			username: "",
+			password: "",
 		},
 	});
 
-	const onSubmit = (values: z.infer<typeof formSchema>) => {
-		console.log(values);
-	};
+	async function onSubmit(values: z.infer<typeof registerSchema>) {
+		await authClient.signUp.email(
+			{
+				email: values.email,
+				password: values.password,
+				name: values.name,
+				image: "https://avatar.iran.liara.run/public/26",
+			},
+			{
+				onSuccess: () => {
+					router.push("/dashboard");
+				},
+				onError: (ctx) => {
+					if (ctx.error.code === "USER_ALREADY_EXISTS") {
+						toast.error("Usuário já existe.");
+						return;
+					}
+					toast.error("Erro ao criar conta.");
+				},
+			},
+		);
+	}
 
 	return (
 		<Card>
-			<CardHeader>
-				<CardTitle className="font-inter font-bold text-2xl">
-					Criar conta
-				</CardTitle>
-				<CardDescription className="font-plus-jakarta-sans">
-					Crie uma conta para poder continuar.
-				</CardDescription>
-			</CardHeader>
 			<Form {...form}>
-				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-					<CardContent className="grid gap-6">
+				<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+					<CardHeader>
+						<CardTitle>Criar conta</CardTitle>
+						<CardDescription>Crie uma conta para continuar.</CardDescription>
+					</CardHeader>
+					<CardContent className="space-y-4">
 						<FormField
 							control={form.control}
 							name="name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className="font-plus-jakarta-sans">Nome</FormLabel>
+									<FormLabel>Nome</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="Jonny Malone Silva"
-											className="font-plus-jakarta-sans text-xs"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="username"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="font-plus-jakarta-sans">
-										Nome de usuário
-									</FormLabel>
-									<FormControl>
-										<Input
-											placeholder="jonnymalone"
-											className="font-plus-jakarta-sans text-xs"
-											{...field}
-										/>
+										<Input placeholder="Jonny Malone" {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -111,15 +97,9 @@ function SignUpForm() {
 							name="email"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className="font-plus-jakarta-sans">
-										Email
-									</FormLabel>
+									<FormLabel>E-mail</FormLabel>
 									<FormControl>
-										<Input
-											placeholder="jonnymalone@dr-agenda.com"
-											className="font-plus-jakarta-sans text-xs"
-											{...field}
-										/>
+										<Input placeholder="jonnymalone@gmail.com" {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -130,14 +110,11 @@ function SignUpForm() {
 							name="password"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className="font-plus-jakarta-sans">
-										Senha
-									</FormLabel>
+									<FormLabel>Senha</FormLabel>
 									<FormControl>
 										<Input
+											placeholder="Digite sua senha"
 											type="password"
-											placeholder="Su4 S3nh@"
-											className="font-plus-jakarta-sans text-xs"
 											{...field}
 										/>
 									</FormControl>
@@ -147,8 +124,16 @@ function SignUpForm() {
 						/>
 					</CardContent>
 					<CardFooter>
-						<Button type="submit" className="font-plus-jakarta-sans w-full">
-							Criar conta
+						<Button
+							type="submit"
+							className="w-full"
+							disabled={form.formState.isSubmitting}
+						>
+							{form.formState.isSubmitting ? (
+								<RiLoader5Line className="mr-2 h-4 w-4 animate-spin" />
+							) : (
+								"Criar conta"
+							)}
 						</Button>
 					</CardFooter>
 				</form>
